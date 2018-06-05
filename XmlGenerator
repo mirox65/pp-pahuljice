@@ -1,0 +1,113 @@
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+import org.jdom2.JDOMException;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
+import org.xml.sax.SAXException;
+import org.jdom2.*;
+
+public class XmlPodaci {
+	static String path = "Podaci.xml";
+	private static Osoba osoba1;
+
+	public static void initializeXml()
+			throws ParserConfigurationException, TransformerException, JDOMException, IOException {
+		File file = new File(path);
+		if (file.exists())
+			return;
+
+		Document doc = new Document();
+		Element osobe = new Element("osobe");
+		doc.setRootElement(osobe);
+		XMLOutputter out = new XMLOutputter(Format.getPrettyFormat());
+		out.output(doc, new FileOutputStream(new File(path)));
+
+	}
+
+	public static void saveOsoba(String name, String pass, String ime1, String prezime1, int dob, String spol)
+			throws ParserConfigurationException, SAXException, IOException, TransformerException, JDOMException {
+
+		SAXBuilder builder = new SAXBuilder();
+		Document doc = builder.build(new File(path));
+		Element osobe = doc.getRootElement();
+		Element osoba = new Element("osoba");
+
+		Element username = new Element("username");
+		username.addContent(name);
+		osoba.addContent(username);
+
+		Element password = new Element("password");
+		password.addContent(pass);
+		osoba.addContent(password);
+
+		Element ime = new Element("ime");
+		ime.addContent(ime1);
+		osoba.addContent(ime);
+
+		Element prezime = new Element("prezime");
+		prezime.addContent(prezime1);
+		osoba.addContent(prezime);
+
+		Element godine = new Element("dob");
+		godine.addContent(dob + "");
+		osoba.addContent(godine);
+
+		Element spolEle = new Element("spol");
+		spolEle.addContent(spol);
+		osoba.addContent(spolEle);
+
+		osobe.addContent(osoba);
+
+		XMLOutputter out = new XMLOutputter(Format.getPrettyFormat());
+		out.output(doc, new FileOutputStream(new File(path)));
+	}
+
+	public static void updateOsoba(String name, String pass, String ime1, String prezime1, int dob, String spol)
+			throws ParserConfigurationException, SAXException, IOException, TransformerException, JDOMException {
+
+		SAXBuilder builder = new SAXBuilder();
+		Document doc = builder.build(new File(path));
+		Element osobe = doc.getRootElement();
+		Element osoba = null;
+		for (Element element : osobe.getChildren()) {
+			if (element.getChild("username").getText().equals(name)) {
+				osoba = element;
+			}
+		}
+
+		osoba.getChild("password").setText(pass);
+		osoba.getChild("ime").setText(ime1);
+		osoba.getChild("prezime").setText(prezime1);
+		osoba.getChild("dob").setText(dob + "");
+		osoba.getChild("spol").setText(spol);
+
+		XMLOutputter out = new XMLOutputter(Format.getPrettyFormat());
+		out.output(doc, new FileOutputStream(new File(path)));
+
+	}
+
+	public static Osoba autentifikacija(String username, String password)
+			throws ParserConfigurationException, SAXException, IOException, JDOMException {
+		SAXBuilder builder = new SAXBuilder();
+
+		org.jdom2.Document doc = builder.build(new File(path));
+
+		org.jdom2.Element osobe = doc.getRootElement();
+
+		for (org.jdom2.Element osoba : osobe.getChildren("osoba")) {
+			if (osoba.getChild("username").getText().equals(username)
+					&& osoba.getChild("password").getText().equals(password)) {
+				osoba1 = new Osoba(osoba.getChild("username").getText(), osoba.getChild("password").getText(),
+						osoba.getChild("ime").getText(), osoba.getChild("prezime").getText(),
+						osoba.getChild("spol").getText(), Integer.parseInt(osoba.getChild("dob").getText()));
+				return osoba1;
+			}
+		}
+		return null;
+	}
+}
