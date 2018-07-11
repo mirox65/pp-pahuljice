@@ -24,6 +24,15 @@ namespace XML_Adresar
         string email = "E-mail";
         string Tel = "Telefon";
         string Napomena = "Napomena";
+
+        //komentar da vidim šta se dešava kad napravim branch
+
+        // komentar za dodatak2
+
+        //valjda sam u dodatku 2_2
+
+        //opet smo u 2_2
+
         public FormXml()
         {
             InitializeComponent();
